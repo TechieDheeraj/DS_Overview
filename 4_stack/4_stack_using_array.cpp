@@ -1,5 +1,8 @@
 #include<iostream>
+#include<map>
+#include<variant>
 
+using namespace std;
 /* Creating Stack of any Data-type using Dynamic Array */
 
 class StackOverflow : public exception {};
@@ -31,7 +34,8 @@ class Stack {
       bool isFull();
 };
 
-void Stack<T>::push(T data) {
+template <class T>
+void Stack<T>::push(T data) throw(StackOverflow) {
    
    if (++top == size)
       throw StackOverflow();
@@ -39,7 +43,8 @@ void Stack<T>::push(T data) {
    stackArray[top] = data;
 }
 
-T Stack<T>::pop() {
+template <class T>
+T Stack<T>::pop() throw(StackUnderflow) {
 
    T data;
 
@@ -51,6 +56,7 @@ T Stack<T>::pop() {
    return data;
 }
 
+template <class T>
 T Stack<T>::peek(int index) {
 
    if (index >= size)
@@ -59,6 +65,7 @@ T Stack<T>::peek(int index) {
    return stackArray[index];
 }
 
+template <class T>
 bool Stack<T>::isEmpty() {
    
    if (top < 0)
@@ -67,6 +74,7 @@ bool Stack<T>::isEmpty() {
       return false;
 }
 
+template <class T>
 bool Stack<T>::isFull() {
    
    if (top == size-1)
@@ -75,38 +83,44 @@ bool Stack<T>::isFull() {
       return false;
 }
 
-Stack *allocateStack(string type, int sz) {
+/*
+template<class T>
+Stack<T> *allocateStack(string type, int sz) {
 
    if (type == "int") {
-      Stack<int> obj = new Stack<int>(sz);
+      Stack<int> *obj = new Stack<int>(sz);
       return obj;
    }
    if (type == "char") {
-      Stack<char> obj = new Stack<char>(sz);
+      Stack<char> *obj = new Stack<char>(sz);
       return obj;
    }
    if (type == "float") {
-      Stack<float> obj = new Stack<float>(sz);
+      Stack<float> *obj = new Stack<float>(sz);
       return obj;
    }
    if (type == "string") {
-      Stack<string> obj = new Stack<string>(sz);
+      Stack<string> *obj = new Stack<string>(sz);
       return obj;
    }
 }
+*/
 
-Stack *stackDeclaration(int type, int sz);
+//Stack *stackDeclaration(int type, int sz);
+string stackDeclaration(int type) {
 
    map<int, string> stackType = {{1, "int"}, {2, "char"}, {3, "float"}, {4, "string"}};
 
-   for (auto i : stackType) {
-      if ( i->first == type )
-         return allocatStack(type, sz); 
+   for(auto &i : stackType) {
+      if ( i.first == type )
+         return i.second; 
+        // return allocatStack(i->second, sz); 
    }
 }
 
 int main() {
 
+   int sz;
    int choice;
    int dataType;
 
@@ -124,7 +138,26 @@ int main() {
       cout << "Enter the size of Stack: " << endl;
       cin >> sz;
 
-      void *ptr = stackDeclaration(dataType, sz); // TODO: How Can I take into specific Stack Object
+      string type = stackDeclaration(dataType, sz); // TODO: How Can I take into specific Stack Object
+
+      //boost::variant< int, std::string > u("hello world");
+
+      std::variant<Stack<std::string>*, Stack<int>*, Stack<char>*, Stack<float>*> u;
+
+      //Stack<int> *stackobj = (type == "int") ? new Stack<int>(sz) : NULL;
+
+      if (type == "int") {
+         u = new Stack<int>(sz);
+      }
+      if (stackObj == "char") {
+         u = new Stack<char>(sz);
+      }
+      else if (type == "float") {
+         u = new Stack<float>(sz);
+      }
+      else if (type == "string") {
+         u = new Stack<string>(sz);
+      }
 
       cout << "\n\t\t1. Push Value into Stack" << endl;
       cout << "\n\t\t2. Pop  Value from Stack" << endl;
