@@ -1,6 +1,6 @@
 #include<iostream>
 #include<map>
-#include<variant>
+//#include<variant>
 
 using namespace std;
 /* Creating Stack of any Data-type using Dynamic Array */
@@ -13,12 +13,13 @@ template <class T>
 class Stack {
    
    private:
-      int top = -1;
-      int size = 0;
+      int top;
+      int size;
       T *stackArray;
 
    public:
       Stack(int sz) {
+         top = -1;
          size = sz;
          stackArray = new T[size];
       }
@@ -27,18 +28,22 @@ class Stack {
          delete stackArray;
       }
 
-      void push(T data) throw(StackOverflow);
+      void push(T) throw(StackOverflow);
       T pop() throw(StackUnderflow);
       T peek(int index);
+      int getTop();
       bool isEmpty();
       bool isFull();
+      void display();
 };
 
 template <class T>
 void Stack<T>::push(T data) throw(StackOverflow) {
    
-   if (++top == size)
+   if (++top > size-1) {
+      --top;
       throw StackOverflow();
+   }
 
    stackArray[top] = data;
 }
@@ -52,6 +57,7 @@ T Stack<T>::pop() throw(StackUnderflow) {
       throw StackUnderflow();
 
    data = stackArray[top--];
+   stackArray[top+1] = 0; // Just to reset value at Popped index
 
    return data;
 }
@@ -59,10 +65,15 @@ T Stack<T>::pop() throw(StackUnderflow) {
 template <class T>
 T Stack<T>::peek(int index) {
 
-   if (index >= size)
+   if (index >= size || index < 0)
       throw InvalidOperation();
 
    return stackArray[index];
+}
+
+template <class T>
+int Stack<T>::getTop() {
+   return top;
 }
 
 template <class T>
@@ -81,6 +92,16 @@ bool Stack<T>::isFull() {
       return true;
    else
       return false;
+}
+
+template <class T>
+void Stack<T>::display() {
+   cout << "\n\t\t[ ";
+
+   for (int i = 0; i < size; ++i)
+      cout << stackArray[i] << ", ";
+
+   cout << "]" << endl;
 }
 
 /*
@@ -104,7 +125,6 @@ Stack<T> *allocateStack(string type, int sz) {
       return obj;
    }
 }
-*/
 
 //Stack *stackDeclaration(int type, int sz);
 string stackDeclaration(int type) {
@@ -118,13 +138,25 @@ string stackDeclaration(int type) {
    }
 }
 
+*/
+
 int main() {
 
    int sz;
+   int index;
    int choice;
-   int dataType;
+//   int dataType;
+   int value;
+
+   cout << "\n\t\t  ********** STACK ***********\n\n" << endl;
+
+   cout << "Enter the size of Stack: " << endl;
+   cin >> sz;
+
+   Stack<int>stackObj(sz);// = new Stack<int>(sz); 
 
    do {
+   /*
       cout << "Enter Type of Stack :" << endl;
 
       cout << "1. int " << endl;
@@ -158,32 +190,82 @@ int main() {
       else if (type == "string") {
          u = new Stack<string>(sz);
       }
+*/
 
       cout << "\n\t\t1. Push Value into Stack" << endl;
       cout << "\n\t\t2. Pop  Value from Stack" << endl;
       cout << "\n\t\t3. Peek Value from Stack" << endl;
       cout << "\n\t\t4. Get Top Pointer index in Stack" << endl;
-      cout << "\n\t\t4. Check if Stack is Empty" << endl;
-      cout << "\n\t\t5. Check if Stack is Full" << endl;
+      cout << "\n\t\t5. Check if Stack is Empty" << endl;
+      cout << "\n\t\t6. Check if Stack is Full" << endl;
+      cout << "\n\t\t7. Display" << endl;
+      cout << "\n\t\t8. Quit" << endl;
 
       cout << "\n\t Enter Your Choice: ";
       cin >> choice;
 
-      try {
-         stackObj.push(3);
-      }
-      catch (StackOverflow) {
-         cout << "Got StackOverflow Exception" << endl;
-      }
+      switch (choice) {
+      
+         case 1:
+            cout << "\n\t\t Enter Value: ";
+            cin >> value;
 
-      try {
-         cout << "Popped value from stack is : " <<  stackObj.pop();
-      }
-      catch (StackUnderflow) {
-         cout << "Got StackUnderflow Exception" << endl;
+            try {
+               stackObj.push(value);
+            }
+            catch (StackOverflow) {
+               cout << "Got StackOverflow Exception" << endl;
+            }
+            break;
+
+         case 2:
+            try {
+               value = stackObj.pop();
+               cout << "\nPopped value from stack is : " << value << endl; 
+            }
+            catch (StackUnderflow) {
+               cout << "\nGot StackUnderflow Exception" << endl;
+            }
+            break;
+
+         case 3:
+            cout << "\n\t\t Enter Index: ";
+            cin >> index; 
+            
+            try {
+               value = stackObj.peek(index);
+               cout << "\nValue is " << value << endl;
+            }
+            catch(InvalidOperation) {
+               cout << "\nPlease Enter Correct Index" << endl;
+            }
+            break;
+         case 4:
+            cout << "\nTop is at: " << stackObj.getTop() << endl;
+            break;
+
+         case 5:
+            cout << "\nStack is Empty: \n" << boolalpha << stackObj.isEmpty();
+            break;
+
+         case 6:
+            cout << "\nStack is Full: \n" << boolalpha << stackObj.isFull();
+            break;
+         
+         case 7:
+               stackObj.display();
+               break;
+
+         case 8:
+            cout << "Exiting ..... " << endl;
+            break;
+
+         default:
+            cout << "Enter Valid Choice " << endl;
+            break;
       }
    }
-   while (count != 5);
+   while (choice != 8);
 
    return 0;
 }
